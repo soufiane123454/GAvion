@@ -43,6 +43,7 @@ Configuration de l'environnement de développement : Installation Python, Tkinte
 - Tests et débogage : Phase des tests pour vérifier les fonctionnalités de l'application. Identification et correction des erreurs, des bugs et des problèmes de logique.
 
 5 - STRUCTURE DU CODE
+
 Le projet se compose de deux fichiers principaux : classes.py et reservation_billet_evenement.py.
 
 Le fichier classes.py contient la définition des classes suivantes : Evenement, Billet, Participant, et GestionBilletEvenementDB. Chacune de ces classes est dédiée à une fonction spécifique du projet.
@@ -58,6 +59,7 @@ Quant à la classe GestionBilletEvenementDB, elle se charge de la création de l
 Le fichier reservation_billet_evenement.py contient la classe Application, qui occupe une position centrale en connectant l'interface graphique élaborée avec Tkinter au programme Python. Elle facilite l'interaction entre l'utilisateur et les différentes fonctionnalités du projet.
 
 6 - UTILISATION
+
 Pour exécuter le code, il est nécessaire de fournir les paramètres de connexion à la base de données dans la méthode "_get_db_connection" du fichier classes.py. Cette méthode se situe comme suit :
 
 À la ligne 31 pour la classe Evenement.
