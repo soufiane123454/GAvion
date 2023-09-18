@@ -1,10 +1,10 @@
-# Gestion-Reservation-Billet
+# GESTION DE RÉSERVATION DES BILLETS D'UN ÉVÉNEMENT
 
-1- INTRODUCTION
+1 - INTRODUCTION
 
 Le système de gestion d'événements est une application développée dans le but de faciliter la gestion complète des événements, des participants et des billets associés. Cette application offre des fonctionnalités telles que la création, la modification et la suppression d'événements, l'enregistrement des participants ainsi que la gestion des billets vendus. Son objectif principal est de simplifier et d'optimiser l'organisation des événements en automatisant les processus d'inscription, de paiement et de suivi des données des participants. Grâce à cette application, les organisateurs d'événements pourront gérer efficacement toutes les facettes de leurs événements, améliorant ainsi l'expérience des participants et garantissant le bon déroulement de chaque événement.
 
-2- HYPOTHÈSE
+2 - HYPOTHÈSE
 
 Dans le cadre de ce projet de système de gestion d'événements, nous supposons que l'application sera utilisée principalement par des organisateurs d'événements pour gérer des événements de différentes natures tels que des conférences, des concerts ou des expositions.
 Les opérations effectuées se concentrent principalement sur les opérations CRUD (Create, Read, Update, Delete) pour les entités principales : Événement, Participant et Billet. Voici un aperçu des opérations CRUD associées à chaque entité :
@@ -28,7 +28,7 @@ Update : Mettre à jour les informations d'un billet existant, telles que son ty
 Delete : Supprimer un billet existant, ainsi que toutes les données associées.
 Ces opérations CRUD permettent aux utilisateurs de gérer efficacement les événements, les participants et les billets, en créant de nouvelles entrées, en consultant les informations existantes, en mettant à jour les données et en supprimant les enregistrements selon les besoins.
 
-3- MATÉRIELS UTILISÉS :
+3 - MATÉRIELS UTILISÉS :
 Ordinateur : MacBook Pro 2020 m1
 Logiciel : Anaconda-Navigator (Spyder), MySQL Community
 Langage de programmation : Python, Sql
