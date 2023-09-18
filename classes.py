@@ -33,8 +33,8 @@ class Evenement:
         db = GestionBilletEvenementDB(
             host="localhost",
             user="root",
-            password="Stage2023",
-            database="Reservation"
+            password="password",
+            database="Reservation"    # Nom de la base de données, si elle n'existe pas, elle sera créée
         )
         connection = db.get_connection()
         return db, connection
@@ -138,8 +138,8 @@ class Participant:
         db = GestionBilletEvenementDB(
             host="localhost",
             user="root",
-            password="Stage2023",
-            database="Reservation"
+            password="password",
+            database="Reservation"            # Nom de la base de données, si elle n'existe pas, elle sera créée
         )
         connection = db.get_connection()
         return db, connection
@@ -292,8 +292,8 @@ class Billet:
         db = GestionBilletEvenementDB(
             host="localhost",
             user="root",
-            password="Stage2023",
-            database="Reservation"
+            password="password",
+            database="Reservation"        # Nom de la base de données, si elle n'existe pas, elle sera créée
         )
         connection = db.get_connection()
         return db, connection
