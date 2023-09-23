@@ -15,6 +15,7 @@ from tkinter import ttk, messagebox
 from Classes import Evenement,Participant,Billet
 
 
+
 class Application(tk.Tk):
     def __init__(self):
         # Initialise la fenêtre principale de l'application
@@ -218,7 +219,7 @@ class Application(tk.Tk):
         billets = billet.recuperer_billet()
         
         # Définissez les en-têtes de colonnes pour afficher les données dans le Treeview
-        self.column_headings = ("Identifiant", "Type de billet", "Prix du billet", "Événement", "Participant")
+        self.column_headings = ("Identifiant", "Type de billet", "Prix du billet", "Événement", "Email du participant")
         self.columns = ("col1", "col2", "col3", "col4", "col5")  
         self.col_widths = (200, 230, 150, 280, 260)
     
@@ -230,34 +231,14 @@ class Application(tk.Tk):
         
         # Parcourez la liste des billets récupérés de la base de données
         for billet in billets:
-            # Créez une instance de la classe Evenement pour interagir avec la table Evenement de la base de données
-            evenement = Evenement(None, None, None, None, None)
-            
-            # Obtenez l'ID de l'événement depuis le billet en cours
-            id_evenement = billet[3]
-            
-            # Recherchez l'événement associé à cet ID
-            nom_ev = evenement.rechercher_par_id(id_evenement)
-    
-            # Créez une instance de la classe Participant pour interagir avec la table Participant de la base de données
-            participant = Participant(None, None, None, None, None)
-            
-            # Obtenez l'ID du participant depuis le billet en cours
-            id_participant = billet[4]
-            
-            # Recherchez le participant associé à cet ID
-            part = participant.rechercher_par_id(id_participant)
-            
-            # Obtenez le nom et le prénom du participant
-            nom, prenom = part[0], part[1]
             
             # Insérez les données du billet dans le Treeview
             self.treeview.insert("", tk.END, values=(
                 billet[0],         # Identifiant du billet
                 billet[1],         # Type de billet
                 billet[2],         # Prix du billet
-                nom_ev,            # Nom de l'événement associé
-                str(nom) + " " + str(prenom)  # Nom complet du participant associé
+                billet[3],            # Nom de l'événement associé
+                billet[4]  # Email du participant associé
             ))
         
         # Marquez le menu actuellement sélectionné comme "billets"
@@ -331,126 +312,69 @@ class Application(tk.Tk):
             
             # Si la table sélectionnée est "evenements"
             if table_name == "evenements":
-                # Créez une fenêtre de formulaire pour ajouter un événement
-                form = tk.Toplevel(self)
-                form.geometry("600x500")
-                form.title("Ajouter un Événement")
                 
-                # Ajoutez des champs de saisie pour les informations de l'événement
-                label_nom = tk.Label(form, text="Nom de l'événement:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_nom.pack(pady=10)
-                entry_nom = tk.Entry(form, width=25)
-                entry_nom.pack()
+                # Crée une instance de la classe Form avec le titre "Ajouter un événement"
+                form = Form("Ajouter un événement")
                 
-                label_date = tk.Label(form, text="Date de l'événement:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_date.pack(pady=10)
-                entry_date = tk.Entry(form, width=25)
-                entry_date.pack()
+                # Définit une liste de textes à utiliser comme libellés
+                text_of_label = ["Nom de l'événement:","Date de l'événement:","Lieu de l'événement:","Description de l'événement:","Capacité de l'événement:"]
                 
-                label_lieu = tk.Label(form, text="Lieu de l'événement:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_lieu.pack(pady=10)
-                entry_lieu = tk.Entry(form, width=25)
-                entry_lieu.pack()
-                
-                label_desc = tk.Label(form, text="Description de l'événement:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_desc.pack(pady=10)
-                entry_desc = tk.Entry(form, width=25)
-                entry_desc.pack()
-                
-                label_capacite = tk.Label(form, text="Capacité de l'événement:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_capacite.pack(pady=10)
-                entry_capacite = tk.Entry(form, width=25)
-                entry_capacite.pack()
-                
+                # Crée une liste vide pour stocker les paires de libellés et de zones de saisie
+                label_entry = []
+                for x in text_of_label:
+                    # Appelle la méthode create_label_input de la classe Form pour créer un libellé et une zone de saisie
+                    # Ajoute le résultat (la paire libellé, zone de saisie) à la liste label_entry
+                    result = form.create_label_input(x,"")
+                    label_entry.append(result)
+                    
                 # Ajoutez un bouton de soumission pour ajouter l'événement
-                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_add_event(entry_nom, entry_date, entry_lieu, entry_desc, entry_capacite, form))
+                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_add_event(label_entry[0][1], label_entry[1][1], label_entry[2][1], label_entry[3][1], label_entry[4][1], form))
                 submit_button.pack()
                 
             # Si la table sélectionnée est "billets"
             elif table_name == "billets":
-                # Créez une fenêtre de formulaire pour ajouter un billet
-                form = tk.Toplevel(self)
-                form.geometry("600x500")
-                form.title("Ajouter un Billet")
                 
-                # Ajoutez des champs de saisie pour les informations du billet
-                label_type = tk.Label(form, text="Type du billet:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_type.pack(pady=10)
-                entry_type = tk.Entry(form, width=25)
-                entry_type.pack()
+                # Crée une instance de la classe Form avec le titre "Ajouter un événement"
+                form = Form("Ajouter un événement")
                 
-                label_prix = tk.Label(form, text="Prix du billet:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_prix.pack(pady=10)
-                entry_prix = tk.Entry(form, width=25)
-                entry_prix.pack()
+                # Définit une liste de textes à utiliser comme libellés
+                text_of_label = ["Type du billet:", "Prix du billet:"]
                 
-                label_ev = tk.Label(form, text="Événement associé:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_ev.pack(pady=10)
+                # Crée une liste vide pour stocker les paires de libellés et de zones de saisie
+                label_entry = []
                 
-                # Créez une liste déroulante des événements existants
-                evenement = Evenement(None, None, None, None, None)
-                evenements = evenement.recuperer_ev()
-                list_ev = []
+                # Parcourt la liste des textes des libellés
+                for x in text_of_label:
+                    # Appelle la méthode create_label_input de la classe Form pour créer un libellé et une zone de saisie
+                    # Ajoute le résultat (la paire libellé, zone de saisie) à la liste label_entry
+                    result = form.create_label_input(x, "")
+                    label_entry.append(result)
+
                 
-                for ev in evenements:
-                    list_ev.append(ev[1])
+                # Crée une liste déroulante pour les événements existants et ajoute le résultat à label_entry
+                result = form.create_label_combo_event("")
+                label_entry.append(result)
                 
-                ev_combobox = ttk.Combobox(form, values=list_ev, state="readonly", width=23)
-                ev_combobox.pack()
-                
-                label_part = tk.Label(form, text="Participant associé:", bg="orange", fg="white", font=("Arial", 16), width=25)
-                label_part.pack(pady=10)
-                
-                # Créez une liste déroulante des participants existants
-                participant = Participant(None, None, None, None, None)
-                participants = participant.recuperer_part()
-                list_part = []
-                
-                for part in participants:
-                    list_part.append(part[4])
-                
-                part_combobox = ttk.Combobox(form, values=list_part, state="readonly", width=23)
-                part_combobox.pack()
+                # Crée une liste déroulante pour les participants existants et ajoute le résultat à label_entry
+                result = form.create_label_combo_part("")
+                label_entry.append(result)
+
                 
                 # Ajoutez un bouton de soumission pour ajouter le billet
-                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_add_billet(entry_type, entry_prix, ev_combobox, part_combobox, form))
+                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_add_billet(label_entry[0][1], label_entry[1][1], label_entry[2][1], label_entry[3][1], form))
                 submit_button.pack()
                 
             # Si la table sélectionnée est "participants"
             elif table_name == "participants":
-                # Créez une fenêtre de formulaire pour ajouter un participant
-                form = tk.Toplevel(self)
-                form.geometry("600x500")
-                form.title("Ajouter un Participant")
-                
-                # Ajoutez des champs de saisie pour les informations du participant
-                label_nom = tk.Label(form, text="Nom du participant:", bg="orange", fg="white", font=("Arial", 16), width=30)
-                label_nom.pack(pady=10)
-                entry_nom = tk.Entry(form, width=30)
-                entry_nom.pack()
-                
-                label_prenom = tk.Label(form, text="Prénom du participant:", bg="orange", fg="white", font=("Arial", 16), width=30)
-                label_prenom.pack(pady=10)
-                entry_prenom = tk.Entry(form, width=30)
-                entry_prenom.pack()
-                
-                label_tel = tk.Label(form, text="Téléphone du participant:", bg="orange", fg="white", font=("Arial", 16), width=30)
-                label_tel.pack(pady=10)
-                entry_tel = tk.Entry(form, width=30)
-                entry_tel.pack()
-                
-                label_email = tk.Label(form, text="Email du participant:", bg="orange", fg="white", font=("Arial", 16), width=30)
-                label_email.pack(pady=10)
-                entry_email = tk.Entry(form, width=30)
-                entry_email.pack()
-                
-                label_date = tk.Label(form, text="Date d'inscription du participant:", bg="orange", fg="white", font=("Arial", 16), width=30)
-                label_date.pack(pady=10)
-                entry_date = tk.Entry(form, width=30)
-                entry_date.pack()
-                
-                # Ajoutez un bouton de soumission pour ajouter le participant
-                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_add_part(entry_nom, entry_prenom, entry_tel, entry_email, entry_date, form))
+                # Code similaire à l'ajout d'un événement
+                form = Form("Ajouter un particiapant")
+                text_of_label = ["Nom du participant:","Prénom du participant:","Téléphone du participant:","Email du participant:","Date d'inscription du participant:"]
+                label_entry = []
+                for x in text_of_label:
+                    result = form.create_label_input(x,"")
+                    label_entry.append(result)
+                 
+                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_add_part(label_entry[0][1], label_entry[1][1], label_entry[2][1], label_entry[3][1], label_entry[4][1], form,label_entry))
                 submit_button.pack()
                 
             # Affichez un avertissement si aucune table n'a été sélectionnée
@@ -522,7 +446,7 @@ class Application(tk.Tk):
         # Affichez la liste mise à jour des billets
         self.show_billets()
     
-    def handle_add_part(self, entry_nom, entry_prenom, entry_tel, entry_email, entry_date, form):
+    def handle_add_part(self, entry_nom, entry_prenom, entry_tel, entry_email, entry_date, form, label_entry):
         
         """
         Cette methode est une version de la methode 'handle_add_event' pour 
@@ -560,169 +484,124 @@ class Application(tk.Tk):
         
         # Vérifie si un élément est sélectionné
         if selected_item:
-            # Crée une fenêtre de formulaire pour la modification
-            form = tk.Toplevel(self)
-            form.geometry("600x400")
             
+            item_values = self.treeview.item(selected_item)["values"]
+            print(item_values)
             # Selon la table sélectionnée, configure le titre du formulaire et récupère les valeurs de l'élément sélectionné
             if table_name == "evenements":
-                form.title("Modifier un événement")
-                item_values = self.treeview.item(selected_item)["values"]
-    
-                # Crée des étiquettes et des champs de saisie pour chaque attribut de l'événement avec pré-remplissage des valeurs actuelles
-                label_nom = tk.Label(form, text="Nom de l'événement:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_nom.pack(pady=10)
-                entry_nom = tk.Entry(form,width=25)
-                entry_nom.pack()
-                entry_nom.insert(tk.END, item_values[1])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_date = tk.Label(form, text="Date de l'événement:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_date.pack(pady=10)
-                entry_date = tk.Entry(form,width=25)
-                entry_date.pack()
-                entry_date.insert(tk.END, item_values[2])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_lieu = tk.Label(form, text="Lieu de l'événement:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_lieu.pack(pady=10)
-                entry_lieu = tk.Entry(form,width=25)
-                entry_lieu.pack()
-                entry_lieu.insert(tk.END, item_values[3])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_desc = tk.Label(form, text="Description de l'événement:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_desc.pack(pady=10)
-                entry_desc = tk.Entry(form,width=25)
-                entry_desc.pack()
-                entry_desc.insert(tk.END, item_values[4])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_capacite = tk.Label(form, text="CapacitÃ© de l'événement:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_capacite.pack(pady=10)
-                entry_capacite = tk.Entry(form,width=25)
-                entry_capacite.pack()
-                entry_capacite.insert(tk.END, item_values[5])  # PrÃ©-remplit avec la valeur actuelle
-    
-                # Définit une fonction pour traiter la modification de l'événement
-                def handle_modify_event():
-                    nouveau_nom = entry_nom.get()
-                    nouvelle_date = entry_date.get()
-                    nouveau_lieu = entry_lieu.get()
-                    nouvelle_description = entry_desc.get()
-                    nouvelle_capacite = entry_capacite.get()
-    
-                    evenement = Evenement(None, None, None, None, None)
-                    evenement.modifier(nouveau_nom, nouvelle_date, nouveau_lieu, nouvelle_description, nouvelle_capacite, item_values[0])
-                    messagebox.showinfo("Modification", "Modification effectuée")
-                    self.show_evenements()
-                    form.destroy()
-    
-                # Crée un bouton pour valider la modification
-                submit_button = tk.Button(form, text="Valider", command=handle_modify_event)
+                
+                # Crée une instance de la classe Form pour modifier un événement
+                form = Form("Modifier un événement")
+                # Définit une liste de textes à utiliser comme libellés pour les champs de modification
+                text_of_label = ["Nom de l'événement:","Date de l'événement:","Lieu de l'événement:","Description de l'événement:","Capacité de l'événement:"]
+                # Crée une liste vide pour stocker les paires de libellés et de zones de saisie
+                label_entry = []
+                for i in range(len(text_of_label)):
+                    # Appelle la méthode create_label_input de la classe Form pour créer un libellé et une zone de saisie
+                    # avec les valeurs correspondantes extraites de item_values
+                    result = form.create_label_input(text_of_label[i],item_values[i+1])
+                    label_entry.append(result)
+                    
+                # Ajoutez un bouton de soumission pour ajouter l'événement
+                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_modify_event(label_entry[0][1], label_entry[1][1], label_entry[2][1], label_entry[3][1], label_entry[4][1],item_values[0], form))
                 submit_button.pack()
     
             elif table_name == "billets":
                 # (Code similaire pour la modification des billets)
-
-                form.title("Modifier un billet")
-                item_values = self.treeview.item(selected_item)["values"]
-    
-                label_type = tk.Label(form, text="Type du billet:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_type.pack(pady=10)
-                entry_type = tk.Entry(form, width=25)
-                entry_type.pack()
-                entry_type.insert(tk.END, item_values[1])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_prix = tk.Label(form, text="Prix du billet:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_prix.pack(pady=10)
-                entry_prix = tk.Entry(form, width=25)
-                entry_prix.pack()
-                entry_prix.insert(tk.END, item_values[2])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_ev = tk.Label(form, text="Evenement associé:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_ev.pack(pady=10)
-                entry_ev = tk.Entry(form, width=25)
-                entry_ev.pack()
-                entry_ev.insert(tk.END, item_values[3])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_part = tk.Label(form, text="Participant associé:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_part.pack(pady=10)
-                entry_part = tk.Entry(form, width=25)
-                entry_part.pack()
-                entry_part.insert(tk.END, item_values[4])  # PrÃ©-remplit avec la valeur actuelle
-    
-                
-                def handle_modify_billet():
-                    type_b= entry_type.get()
-                    prix_b = entry_prix.get()
-                    ev_b = entry_ev.get()
-                    part_b = entry_part.get()
+                form = Form("Modifier un billet")
+                text_of_label = ["Type du billet:","Prix du billet:"]
+                label_entry = []
+                for i in range(len(text_of_label)):
+                    result = form.create_label_input(text_of_label[i],item_values[i+1])
+                    label_entry.append(result)
                     
-                    billet = Billet(None, None, None, None)
-                    print(item_values[0])
-                    billet.modifier(type_b,prix_b,ev_b,part_b,item_values[0])
-                    messagebox.showinfo("Modification", "Modification effectuée")
-                    self.show_billets()
-                    form.destroy()
-    
-                submit_button = tk.Button(form, text="Valider", command=handle_modify_billet)
+                # Créez une liste déroulante des événements existants                
+                result = form.create_label_combo_event(item_values[3])
+                label_entry.append(result)
+                
+                # Créez une liste déroulante des participants existants
+                result = form.create_label_combo_part(item_values[4])
+                label_entry.append(result)
+                
+                # Ajoutez un bouton de soumission pour ajouter le billet
+                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_modify_billet(label_entry[0][1], label_entry[1][1], label_entry[2][1], label_entry[3][1],item_values[0], form))
                 submit_button.pack()
+                    
                 
             elif table_name == "participants":
                 # (Code similaire pour la modification des participants)
-                form.title("Modifier un participant")
                 item_values = self.treeview.item(selected_item)["values"]
     
-                label_nom = tk.Label(form, text="Nom du partcipant:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_nom.pack(pady=10)
-                entry_nom = tk.Entry(form, width=25)
-                entry_nom.pack()
-                entry_nom.insert(tk.END, item_values[1])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_prenom = tk.Label(form, text="Prénom du partcipant:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_prenom.pack(pady=10)
-                entry_prenom = tk.Entry(form, width=25)
-                entry_prenom.pack()
-                entry_prenom.insert(tk.END, item_values[2])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_tel = tk.Label(form, text="Téléphone du partcipant:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_tel.pack(pady=10)
-                entry_tel = tk.Entry(form, width=25)
-                entry_tel.pack()
                 if len(str(item_values[3])) != 10:
                     item_values[3] = str(0) + str(item_values[3])
                 print(item_values[3])
-                entry_tel.insert(tk.END, item_values[3])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_email = tk.Label(form, text="Email du partcipant:", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_email.pack(pady=10)
-                entry_email = tk.Entry(form, width=25)
-                entry_email.pack()
-                entry_email.insert(tk.END, item_values[4])  # PrÃ©-remplit avec la valeur actuelle
-    
-                label_date = tk.Label(form, text="Date d'inscription du participant':", bg="orange", fg="white", font=("Arial", 16),width=25)
-                label_date.pack(pady=10)
-                entry_date = tk.Entry(form, width=25)
-                entry_date.pack()
-                entry_date.insert(tk.END, item_values[5])  # PrÃ©-remplit avec la valeur actuelle
-    
-                def handle_modify_part():
-                    nom = entry_nom.get()
-                    prenom = entry_prenom.get()
-                    tel = entry_tel.get()
-                    email = entry_email.get()
-                    date = entry_date.get()
-    
-                    part = Participant(None, None, None, None, None)
-                    print(item_values[0])
-                    part.modifier(nom,prenom,tel,email,date,item_values[0])
-                    messagebox.showinfo("Modification", "Modification effectuée")
-                    self.show_participants()
-                    form.destroy()
-    
-                submit_button = tk.Button(form, text="Valider", command=handle_modify_part)
+                
+                form = Form("Modifier un événement")
+                text_of_label = ["Nom du participant:","Prénom du participant:","Téléphone du participant:","Email du participant:","Date d'inscription du participant:"]
+                label_entry = []
+                for i in range(len(text_of_label)):
+                    result = form.create_label_input(text_of_label[i],item_values[i+1])
+                    label_entry.append(result)
+                    
+                # Ajoutez un bouton de soumission pour ajouter l'événement
+                submit_button = tk.Button(form, text="Valider", command=lambda: self.handle_modify_part(label_entry[0][1], label_entry[1][1], label_entry[2][1], label_entry[3][1], label_entry[4][1],item_values[0], form))
                 submit_button.pack()
 
         else:
             # Affiche un avertissement si aucun élément n'est sélectionné pour la modification
             messagebox.showwarning("Aucune sélection", "Veuillez sélectionner une ligne à modifier.")
+
+    # Définit une fonction pour traiter la modification de l'événement
+    def handle_modify_event(self, entry_nom,entry_date,entry_lieu,entry_desc,entry_capacite,item_value,form):
+        nouveau_nom = entry_nom.get()
+        nouvelle_date = entry_date.get()
+        nouveau_lieu = entry_lieu.get()
+        nouvelle_description = entry_desc.get()
+        nouvelle_capacite = entry_capacite.get()
+
+        evenement = Evenement(None, None, None, None, None)
+        evenement.modifier(nouveau_nom, nouvelle_date, nouveau_lieu, nouvelle_description, nouvelle_capacite, item_value)
+        messagebox.showinfo("Modification", "Modification effectuée")
+        self.show_evenements()
+        form.destroy()
+    
+    def handle_modify_billet(self,entry_type,entry_prix,entry_ev,entry_part,item_value,form):
+        # Récupérez les données saisies dans les champs de formulaire
+        type_b = entry_type.get()
+        prix_b = entry_prix.get()
+        ev_b = entry_ev.get()
+        
+        # Recherchez l'ID de l'événement associé par son nom
+        evenement = Evenement(None, None, None, None, None)
+        id_ev = evenement.rechercher_par_nom(ev_b)[0][0]
+        
+        # Récupérez le nom du participant sélectionné dans la liste déroulante
+        part_b = entry_part.get()
+        
+        # Recherchez l'ID du participant associé par son email
+        participant = Participant(None, None, None, None, None)
+        id_part = participant.rechercher_par_mail(part_b)[0][0]
+        
+        # Créez une instance de la classe Billet avec les données
+        billet = Billet(None, None, None, None)
+        print(type_b,prix_b,id_ev,id_part,item_value)
+        billet.modifier(type_b,prix_b,id_ev,id_part,item_value)
+        messagebox.showinfo("Modification", "Modification effectuée")
+        self.show_billets()
+        form.destroy()
+    
+    def handle_modify_part(self,entry_nom,entry_prenom,entry_tel,entry_email,entry_date, item_value,form):
+        nom = entry_nom.get()
+        prenom = entry_prenom.get()
+        tel = entry_tel.get()
+        email = entry_email.get()
+        date = entry_date.get()
+
+        part = Participant(None, None, None, None, None)
+        part.modifier(nom,prenom,tel,email,date,item_value)
+        messagebox.showinfo("Modification", "Modification effectuée")
+        self.show_participants()
+        form.destroy()
 
      
     # Methode qui permet de supprimer l'element selectionnée d'une table   
@@ -869,6 +748,65 @@ class Application(tk.Tk):
         self.label_search = None
         self.entry_search = None
         self.submit_search = None
+
+# Class qui gère la création et la gestion du formulaire
+class Form(tk.Toplevel):
+    
+    # Constructeur de la classe, initialise la fenêtre du formulaire avec un titre
+    def __init__(self, title):
+        super().__init__()  # Appelle le constructeur de la classe parente
+        self.geometry("600x500")  # Définit la taille de la fenêtre
+        self.title(title)  # Définit le titre de la fenêtre
+        
+    # Méthode pour créer un libellé et une zone de saisie dans la fenêtre du formulaire
+    def create_label_input(self, name, default_value):
+        label = tk.Label(self, text=name, bg="orange", fg="white", font=("Arial", 16), width=25)
+        label.pack(pady=10)  # Affiche le libellé dans la fenêtre
+        
+        entry = tk.Entry(self, width=25)
+        entry.pack()  # Affiche la zone de saisie dans la fenêtre
+        entry.insert(tk.END, default_value)  # Insère une valeur par défaut dans la zone de saisie
+        
+        return label, entry  # Retourne le libellé et la zone de saisie comme un tuple
+    
+    # Méthode pour créer un libellé et une liste déroulante associée à des événements
+    def create_label_combo_event(self, default_value):
+        evenement = Evenement(None, None, None, None, None)
+        evenements = evenement.recuperer_ev()  # Récupère les événements depuis une source externe
+        
+        list_ev = []
+        for ev in evenements:
+            list_ev.append(ev[1])  # Récupère le nom de l'événement et l'ajoute à la liste
+        
+        label = tk.Label(self, text="Événement associé", bg="orange", fg="white", font=("Arial", 16), width=25)
+        label.pack(pady=10)  # Affiche le libellé dans la fenêtre
+        
+        combobox = ttk.Combobox(self, values=list_ev, state="readonly", width=23)
+        combobox.pack()  # Affiche la liste déroulante dans la fenêtre
+        
+        combobox.set(default_value)  # Définit une valeur par défaut dans la liste déroulante
+        
+        return label, combobox  # Retourne le libellé et la liste déroulante comme un tuple
+    
+    # Méthode pour créer un libellé et une liste déroulante associée à des participants
+    def create_label_combo_part(self, default_value):
+        participant = Participant(None, None, None, None, None)
+        participants = participant.recuperer_part()  # Récupère les participants depuis une source externe
+        
+        list_part = []
+        for part in participants:
+            list_part.append(part[4])  # Récupère l'email du participant et l'ajoute à la liste
+        
+        label = tk.Label(self, text="Participant associé", bg="orange", fg="white", font=("Arial", 16), width=25)
+        label.pack(pady=10)  # Affiche le libellé dans la fenêtre
+        
+        combobox = ttk.Combobox(self, values=list_part, state="readonly", width=23)
+        combobox.pack()  # Affiche la liste déroulante dans la fenêtre
+        
+        combobox.set(default_value)  # Définit une valeur par défaut dans la liste déroulante
+        
+        return label, combobox  # Retourne le libellé et la liste déroulante comme un tuple
+
 
 app = Application()
 
