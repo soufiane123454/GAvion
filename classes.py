@@ -33,8 +33,8 @@ class Evenement:
         db = GestionBilletEvenementDB(
             host="localhost",
             user="root",
-            password="password",
-            database="Reservation"    # Nom de la base de données, si elle n'existe pas, elle sera créée
+            password="Stage2023",
+            database="Reservation"
         )
         connection = db.get_connection()
         return db, connection
@@ -138,8 +138,8 @@ class Participant:
         db = GestionBilletEvenementDB(
             host="localhost",
             user="root",
-            password="password",
-            database="Reservation"            # Nom de la base de données, si elle n'existe pas, elle sera créée
+            password="Stage2023",
+            database="Reservation"
         )
         connection = db.get_connection()
         return db, connection
@@ -150,11 +150,19 @@ class Participant:
     
     # Méthode pour ajouter un participant à la base de données
     def ajouter(self):
-        if not self._valider_email(self.email_part):
-            raise ValueError("L'email n'est pas valide")
+        
+        if not self.valider_name(self.nom_part):
+            raise ValueError("Le nom n'est pas valide")
+            
+        if not self.valider_name(self.prenom_part):
+            raise ValueError("Le nom n'est pas valide")
         
         if not self._valider_telephone(self.tel_part):
             raise ValueError("Le numéro de téléphone n'est pas valide")
+        
+        if not self._valider_email(self.email_part):
+            raise ValueError("L'email n'est pas valide")
+        
         
         if not self._valider_date_inscription(self.date_inscription_part):
             raise ValueError("La date d'inscription n'est pas valide")
@@ -189,6 +197,11 @@ class Participant:
             return date.date() == datetime.now().date()
         except ValueError:
             return False
+        
+    def is_valider_name(self,name):
+        # Le regex permet les lettres majuscules et minuscules, les espaces et les tirets, et doit avoir au moins un caractère.
+        pattern = r"^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$"
+        return re.match(pattern, name) is not None
     
     # Méthode pour supprimer un participant de la base de données par son ID
     def supprimer(self, id_part):
@@ -227,7 +240,7 @@ class Participant:
     # Méthode pour rechercher un participant par son ID
     def rechercher_par_id(self, id_participant):
         mydb, connection = self._get_db_connection()
-        query = "SELECT nom_part, prenom_part FROM participant WHERE id_part LIKE %s"
+        query = "SELECT email_part FROM participant WHERE id_part LIKE %s"
         value = (id_participant,)
         mycursor = connection.cursor()
         mycursor.execute(query, value)
@@ -292,8 +305,8 @@ class Billet:
         db = GestionBilletEvenementDB(
             host="localhost",
             user="root",
-            password="password",
-            database="Reservation"        # Nom de la base de données, si elle n'existe pas, elle sera créée
+            password="Stage2023",
+            database="Reservation"
         )
         connection = db.get_connection()
         return db, connection
@@ -309,7 +322,10 @@ class Billet:
         query = "INSERT INTO billet (type_billet, prix_billet, id_ev, id_part) VALUES (%s, %s, %s, %s)"
         values = (self.type_billet, self.prix_billet, id_ev, self.id_part)
         mycursor = connection.cursor()
-        mycursor.execute(query, values)
+        try:
+            mycursor.execute(query, values)
+        except mysql.connector.errors.DatabaseError.column as e:
+            print(e)
         mycursor.close()
 
         # Fermez la connexion
@@ -359,7 +375,15 @@ class Billet:
     def recuperer_billet(self):
         mydb, connection = self._get_db_connection()
         mycursor = connection.cursor()
-        mycursor.execute("SELECT * FROM billet")
+        mycursor.execute("""
+                         SELECT billet.id_billet,
+                         billet.type_billet,
+                         billet.prix_billet,
+                         evenement.nom_ev,
+                         participant.email_part
+                         FROM billet, evenement, participant
+                         WHERE billet.id_ev = evenement.id_ev and billet.id_part = participant.id_part
+                         """)        
         results = mycursor.fetchall()
         mycursor.close()
         
@@ -419,7 +443,7 @@ class GestionBilletEvenementDB:
                     nom_part VARCHAR(45) NOT NULL,
                     prenom_part VARCHAR(45) NOT NULL,
                     tel_part VARCHAR(15) NOT NULL UNIQUE,
-                    email_participant VARCHAR(60) NOT NULL UNIQUE,
+                    email_part VARCHAR(60) NOT NULL UNIQUE,
                     date_inscription DATE NOT NULL
                 )
             ''')
