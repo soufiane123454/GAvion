@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Ce fichier fait partie intégrante d'un projet de gestion de réservation de billets pour
+Ce fichier fait partie d'un projet de gestion de réservation de billets pour
 des événements. Il englobe la définition de la classe "Application", dont la mission 
 est d'élaborer une interface graphique tout en s'appuyant sur les classes du module 
 "Classes". Ainsi, il vise à fournir une application complète pour la gestion de 
