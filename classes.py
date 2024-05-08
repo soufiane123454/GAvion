@@ -12,7 +12,7 @@ import re
 import mysql.connector
 from datetime import datetime
 
-class Evenement:
+class Evenement1:
     
     """
     Cette classe Evenement gère les opérations liées aux événements dans la base de données, 
